@@ -1,11 +1,137 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <title>我的个人博客</title>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>受保护的网页</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .password-box {
+                @apply bg-white p-8 rounded-xl shadow-lg max-w-md w-full mx-auto transition-all duration-300;
+            }
+            .content-hidden {
+                @apply hidden;
+            }
+        }
+    </style>
 </head>
-<body>
-    <h1>欢迎来到我的博客</h1>
-    <p>这是我创建的博客网站</p>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <!-- 密码输入界面 -->
+    <div id="passwordContainer" class="password-box">
+        <div class="text-center mb-6">
+            <i class="fa fa-lock text-5xl text-primary mb-4"></i>
+            <h2 class="text-2xl font-bold text-gray-800">请输入密码</h2>
+            <p class="text-gray-500 mt-2">此网页受密码保护</p>
+        </div>
+        
+        <div class="space-y-4">
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">密码</label>
+                <div class="relative">
+                    <input type="password" id="password" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition duration-200"
+                        placeholder="请输入访问密码">
+                </div>
+            </div>
+            
+            <button id="submitBtn" 
+                class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition duration-200 flex items-center justify-center gap-2">
+                <span>验证密码</span>
+                <i class="fa fa-arrow-right"></i>
+            </button>
+            
+            <p id="errorMsg" class="text-red-500 text-sm text-center hidden">密码错误，请重试</p>
+        </div>
+    </div>
+
+    <!-- 真正的网页内容（初始隐藏） -->
+    <div id="contentContainer" class="content-hidden w-full max-w-4xl bg-white p-8 rounded-xl shadow-lg">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">欢迎访问我的网页！</h1>
+        <p class="text-gray-600 mb-4">这里是受保护的内容，只有知道密码的人才能看到。</p>
+        <p class="text-gray-600">你可以在这里放置任何你想展示的内容，比如文字、图片、链接等。</p>
+        
+        <!-- 这里可以添加更多你的网页内容 -->
+        <div class="mt-8">
+            <img src="https://picsum.photos/800/400?alt=示例图片" class="w-full h-auto rounded-lg shadow-md" alt="示例图片">
+        </div>
+    </div>
+
+    <script>
+        // 在这里设置你的密码（可以修改成你想要的密码）
+        const CORRECT_PASSWORD = "Blog1910";
+        
+        // 获取页面元素
+        const passwordContainer = document.getElementById('passwordContainer');
+        const contentContainer = document.getElementById('contentContainer');
+        const passwordInput = document.getElementById('password');
+        const submitBtn = document.getElementById('submitBtn');
+        const errorMsg = document.getElementById('errorMsg');
+        
+        // 验证密码函数
+        function checkPassword() {
+            const inputPassword = passwordInput.value;
+            
+            if (inputPassword === CORRECT_PASSWORD) {
+                // 密码正确，隐藏密码框，显示内容
+                passwordContainer.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    passwordContainer.classList.add('hidden');
+                    contentContainer.classList.remove('content-hidden');
+                    // 添加显示动画
+                    contentContainer.classList.add('animate-fadeIn');
+                }, 300);
+                
+                // 记住已登录状态（关闭浏览器后失效）
+                sessionStorage.setItem('authenticated', 'true');
+            } else {
+                // 密码错误，显示错误信息
+                errorMsg.classList.remove('hidden');
+                passwordInput.classList.add('border-red-500');
+                
+                // 3秒后隐藏错误信息
+                setTimeout(() => {
+                    errorMsg.classList.add('hidden');
+                    passwordInput.classList.remove('border-red-500');
+                }, 3000);
+            }
+        }
+        
+        // 点击提交按钮验证
+        submitBtn.addEventListener('click', checkPassword);
+        
+        // 按回车键也可以验证
+        passwordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+        
+        // 页面加载时检查是否已登录
+        window.addEventListener('load', function() {
+            if (sessionStorage.getItem('authenticated') === 'true') {
+                passwordContainer.classList.add('hidden');
+                contentContainer.classList.remove('content-hidden');
+            }
+        });
+    </script>
 </body>
 </html>
