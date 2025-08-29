@@ -15,8 +15,7 @@ div {
     text-align: left; 
 }
 
-div:hover {background-color:hsl(17, 100%, 96%);}
-
 body {
     background-color: rgb(255, 252, 248);
 }
+div:hover {background-color:hsl(17, 100%, 96%);}
